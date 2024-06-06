@@ -1,0 +1,22 @@
+<div class="mt-4">
+    <h3>Create a course</h3>
+    <form method="POST" action="/courses/store">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" id="name">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea type="text" class="form-control" name="description" id="description"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="text" class="form-control" name="image" id="image">
+        </div>
+        <div class="mb-3">
+            <label for="videoID" class="form-label">Video ID</label>
+            <input type="text" class="form-control" name="videoID" id="videoID">
+        </div>
+        <button type="submit" class="btn btn-primary">Create course</button>
+    </form>
+</div>

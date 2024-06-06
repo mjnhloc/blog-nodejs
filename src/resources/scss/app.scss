@@ -3,3 +3,19 @@
 h1 {
     color: $color;
 }
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.button-home {
+    padding: auto;
+}
+
+.check-all-options {
+    width: 140px;
+    margin: 0 16px;
+}

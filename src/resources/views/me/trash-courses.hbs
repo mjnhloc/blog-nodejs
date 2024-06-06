@@ -1,0 +1,140 @@
+<form class='mt-4' method="POST" action="/courses/trash/handle-form-actions">
+  <div>
+    <h3>My deleted courses</h3>
+    <a href='/me/stored/courses'>My courses</a>
+  </div>
+  <div class="mt-4 d-flex align-items-center">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+      <label class="form-check-label" for="checkbox-all">
+        Select all
+      </label>
+    </div>
+    <select class="form-select form-select-sm check-all-options" aria-label="Default select example" name="action"
+      required>
+      <option value="" selected>-- Options --</option>
+      <option value="restore">Restore</option>
+      <option value="delete">Delete</option>
+    </select>
+
+    <button class="btn btn-primary btn-sm disabled" id="execute-btn">Execute</button>
+  </div>
+
+  <table class='table mt-4'>
+    <thead>
+      <tr>
+        <th scope='col' colspan="2">#</th>
+        <th scope='col'>Name</th>
+        <th scope='col'>Description</th>
+        <th scope='col' colspan='3'>Deleted At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each courses}}
+
+      <tr>
+        <td>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="courseIds[]" value="{{this._id}}">
+          </div>
+        </td>
+        <th scope='row'>{{sum @index 1}}</th>
+        <td>{{this.name}}</td>
+        <td>{{this.description}}</td>
+        <td>{{this.deletedAt}}</td>
+        <td>
+          <a href='' class='restore-btn' data-id='{{this._id}}'>Restore</a>
+        </td>
+        <td>
+          <a href='' data-bs-toggle='modal' data-bs-target='#deleteModal' data-id='{{this._id}}'>Delete</a>
+        </td>
+      </tr>
+      {{else}}
+      <td colspan='5' class='text-center'>
+        Trash bin is empty.
+        <a href='/me/stored/courses'>My courses</a>
+      </td>
+
+      {{/each}}
+    </tbody>
+  </table>
+</form>
+
+<div id='deleteModal' class='modal' tabindex='-1'>
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <h5 class='modal-title'>Permanently delete course?</h5>
+        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+      </div>
+      <div class='modal-body'>
+        <p>This action cannot be restore. Are you sure you still want to
+          continue delete this course forever?</p>
+      </div>
+      <div class='modal-footer'>
+        <button type='button' id='delete-modal-btn' class='btn btn-danger'>Permanent delete</button>
+        <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form name='delete-course-form' method='POST'></form>
+<form name='restore-course-form' method='POST'></form>
+
+<script>
+  const deleteModal = document.getElementById('deleteModal');
+  const deleteModalBtn = document.getElementById('delete-modal-btn');
+  const deleteForm = document.forms['delete-course-form'];
+  const restoreForm = document.forms['restore-course-form'];
+  const restoreBtn = $('.restore-btn');
+  const checkboxAll = $('#checkbox-all');
+  const checkboxCourse = $('input[name = "courseIds[]"]');
+  const executeBtn = $('#execute-btn');
+  var courseId;
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', event => {
+      // Button that triggered the modal 
+      const deleteBtn = event.relatedTarget;
+      // Extract info from data - bs -* attributes 
+      courseId = deleteBtn.getAttribute('data-id');
+    })
+  }
+  // Force delete
+  deleteModalBtn.onclick = function () {
+    deleteForm.action = `/courses/${courseId}/force?_method=DELETE`;
+    deleteForm.submit();
+  }
+
+  // Restore
+  restoreBtn.click(function (e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    restoreForm.action = `/courses/${id}/restore?_method=PATCH`;
+    restoreForm.submit();
+  });
+
+  // Check-box all checked or not
+  checkboxAll.change(function () {
+    const isChecked = $(this).prop('checked');
+    $(checkboxCourse).prop('checked', isChecked);
+    reRenderExecuteBtn();
+  });
+
+  checkboxCourse.change(function () {
+    const isCheckedAll = $('input[name = "courseIds[]"]:checked').length === checkboxCourse.length;
+    checkboxAll.prop('checked', isCheckedAll);
+    reRenderExecuteBtn();
+  });
+
+  // Re-render execute button
+  function reRenderExecuteBtn() {
+    const isOneChecked = $('input[name = "courseIds[]"]:checked').length;
+    if (isOneChecked > 0) {
+      executeBtn.removeClass('disabled');
+    } else {
+      executeBtn.addClass('disabled');
+    }
+  }
+
+</script>
